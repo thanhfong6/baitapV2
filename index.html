@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trắc nghiệm: Sử dụng TNTN & BVMT (Phiên bản chính xác)</title>
+  <style>
+    :root{--bg:#f5f7fb;--card:#ffffff;--accent:#1f6feb;--success:#16a34a;--danger:#ef4444}
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:var(--bg); margin:0; padding:24px; color:#0f172a}
+    .container{max-width:920px;margin:0 auto}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    h1{font-size:20px;margin:0}
+    .card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 18px rgba(15,23,42,0.06);}
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .timer{font-weight:700;color:var(--danger)}
+    .progress{height:10px;background:#e6eefb;border-radius:999px;overflow:hidden}
+    .progress > b{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#60a5fa);width:0%}
+    .question{margin:14px 0}
+    .opts{display:grid;grid-template-columns:1fr;gap:10px}
+    .opt{border:1px solid #e6eefb;padding:12px;border-radius:8px;cursor:pointer}
+    .opt input{margin-right:8px}
+    footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+    button{background:var(--accent);color:white;padding:10px 14px;border:0;border-radius:8px;cursor:pointer}
+    .small{font-size:13px;color:#334155}
+    .result{padding:14px;border-radius:10px;margin-top:12px}
+    .correct{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.12)}
+    .wrong{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.08)}
+    .hide{display:none}
+    .controls{display:flex;gap:8px}
+    @media (min-width:720px){.opts{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Trắc nghiệm: Sử dụng hợp lí tài nguyên thiên nhiên & bảo vệ môi trường</h1>
+        <div class="small">Phiên bản: chính xác với đáp án gốc (đã sửa mục sai). Mỗi lần mở trang sẽ <strong>xáo trộn thứ tự câu</strong>.</div>
+      </div>
+      <div style="margin-left:auto" class="card small" id="scoreBox">Điểm: 0 / 0</div>
+    </header>
+
+    <div class="card">
+      <div class="meta">
+        <div>
+          <strong id="qCount">Câu 1 / 0</strong>
+          <div class="small">Thời gian còn lại: <span class="timer" id="timer">00:00</span></div>
+        </div>
+        <div style="width:40%">
+          <div class="progress" aria-hidden>
+            <b id="progressBar"></b>
+          </div>
+        </div>
+      </div>
+
+      <div id="quizArea"></div>
+
+      <footer>
+        <div class="controls">
+          <button id="prevBtn" disabled>Trước</button>
+          <button id="nextBtn">Tiếp</button>
+          <button id="submitBtn">Nộp bài</button>
+        </div>
+        <div class="small">Chế độ: <select id="modeSelect">
+          <option value="practice">Luyện tập (hiện đáp án khi nộp)</option>
+          <option value="test">Kiểm tra (ẩn đáp án đến khi hết giờ hoặc nộp)</option>
+        </select></div>
+      </footer>
+
+      <div id="resultPanel" class="hide">
+        <div class="result correct" id="scoreSummary"></div>
+        <div id="answersList"></div>
+      </div>
+
+    </div>
+
+    <div style="height:18px"></div>
+    <div class="card small">
+      Hướng dẫn: tải file này về (Save as -> index.html) và up lên GitHub repo của bạn. Nếu cần mình sẽ hỗ trợ upload.
+    </div>
+  </div>
+
+<script>
+// ======= DỮ LIỆU CÂU HỎI (Giữ chính xác nội dung + đáp án gốc) =======
+const questions = [
+  {id:1,type:'mc',q:'Sinh vật nước ta có tính đa dạng cao, thể hiện ở',choices:['thành phần loài, hệ sinh thái và nguồn gen.','số lượng sinh vật, phạm vi phân bố và thức ăn.','số lượng loài, khả năng thích nghi và sinh sản.','thành phần động vật, loài thủy sinh và di cư.'],answer:0},
+  {id:2,type:'mc',q:'Nhận định nào sau đây đúng về vai trò của tài nguyên thiên nhiên?',choices:['Tài nguyên thiên nhiên quyết định đến sự phát triển kinh tế-xã hội.','Tài nguyên thiên nhiên không ảnh hưởng đến phát triển kinh tế-xã hội.','Tài nguyên thiên nhiên là tiền đề cơ bản của sự phát triển kinh tế-xã hội.','Tài nguyên thiên nhiên chỉ tác động đến sự phân công lao động xã hội.'],answer:2},
+  {id:3,type:'mc',q:'Một hiện trạng tài nguyên rừng ở nước ta',choices:['diện tích rừng tự nhiên tăng nhanh liên tục qua các năm.','diện tích rừng trồng giảm do ảnh hưởng biến đổi khí hậu.','tỉ lệ che phủ rừng liên tục tăng trong những năm gần đây.','tổng diện tích rừng tăng chủ yếu do diện rừng tự nhiên tăng.'],answer:2},
+  {id:4,type:'mc',q:'Sự suy giảm số lượng và mất đi tính đa dạng di truyền nghiêm trọng nhất hiện nay ở nhóm',choices:['thực vật rừng.','động vật rừng.','thủy sản nước mặn.','thủy sản nước ngọt.'],answer:1},
+  {id:5,type:'mc',q:'Số lượng loài sinh vật đã biết nào dưới đây suy giảm nhiều nhất hiện nay?',choices:['Cá.','Chim.','Bò sát.','Thú.'],answer:0},
+  {id:6,type:'mc',q:'Nguyên nhân trực tiếp dẫn đến sự suy giảm tài nguyên sinh vật ở nước ta là',choices:['sự gia tăng dân số.','tình trạng di dân.','khai thác quá mức.','sự phát triển kinh tế.'],answer:2},
+  {id:7,type:'mc',q:'Nguyên nhân chủ yếu làm suy giảm tài nguyên số lượng, thành phần loài sinh vật nước ta là do',choices:['con người làm thu hẹp diện tích rừng tự nhiên.','môi trường tự nhiên bị ô nhiễm nghiêm trọng.','sự biến đổi mạnh mẽ của khí hậu và thời tiết.','hậu quả của chiến tranh để lại hết sức nặng nề.'],answer:0},
+  {id:8,type:'mc',q:'Biểu hiện chủ yếu nhất của sự suy giảm tài nguyên đất ở nước ta là',choices:['mặn hóa đất.','hoang mạc hóa.','ô nhiễm đất.','xói mòn đất.'],answer:3},
+  {id:9,type:'mc',q:'Quá trình xói mòn đất nước ta chủ yếu xảy ra ở',choices:['đồng bằng.','miền núi.','ven biển.','ven sông.'],answer:1},
+  {id:10,type:'mc',q:'Quá trình hoang mạc hóa ở nước ta diễn ra chủ yếu ở',choices:['Đồng bằng sông Hồng.','vùng Bắc Trung Bộ.','Duyên hải Nam Trung Bộ.','vùng núi Tây Nguyên.'],answer:2},
+  {id:11,type:'mc',q:'Độ phì đất đang suy giảm chủ yếu ở',choices:['vùng chuyên canh nông nghiệp.','khu công nghiệp tập trung.','các làng nghề truyền thống.','đồng bằng hạ lưu các sông.'],answer:0},
+  {id:12,type:'mc',q:'Nguyên nhân chủ yếu làm cho tài nguyên đất nước ta suy giảm là',choices:['các biện pháp canh tác đất không hợp lí.','dân số tăng dẫn đến nhu cầu nhà ở cao.','môi trường địa lí bị ô nhiễm trầm trọng.','đô thị hóa nông thôn ngày càng mở rộng.'],answer:0},
+  {id:13,type:'mc',q:'Loại đất chiếm tỉ lệ lớn nhất trong các loại đất cần cải tạo ở nước ta hiện nay',choices:['đất glây hóa.','đất nhiễm mặn.','đất xám bạc màu.','đất nhiễm phèn.'],answer:3},
+  {id:14,type:'mc',q:'Hệ sinh thái hiện nay chủ yếu là',choices:['rừng nguyên sinh, rừng trồng.','rừng thứ sinh, rừng ngập mặn.','hệ sinh thái biển, đất ngập nước.','rừng tràm, đầm lầy nước ngọt.'],answer:1},
+  {id:15,type:'mc',q:'Hiện nay, hiện tượng môi trường nào sau đây trong các đô thị là báo động nhất?',choices:['Ô nhiễm kênh rạch nội thành.','Xâm nhập mặn ở đô thị ven biển.','Suy giảm mực nước ngầm.','Ô nhiễm bụi mịn.'],answer:3},
+  {id:16,type:'mc',q:'Biện pháp nào sau đây bảo vệ tốt nhất cho đất miền núi?',choices:['Đẩy mạnh thâm canh và công tác bảo vệ vốn rừng.','Tăng cường phân bón và cải tạo thích hợp đất các loại.','Áp dụng tổng thể canh tác nông – lâm và thủy lợi.','Nâng cao hiệu quả sử dụng đất và tăng cường thủy canh.'],answer:2},
+  {id:17,type:'mc',q:'Tình trạng ô nhiễm nguồn nước ở nước ta thường diễn ra',choices:['cục bộ ở nhiều nơi trên lưu vực sông.','phổ biến ở nhiều nơi trên cả nước.','tập trung ở thượng lưu sông lớn.','rải rác ở trung và hạ lưu các sông.'],answer:0},
+  {id:18,type:'mc',q:'Nguyên nhân chính làm cho nguồn nước ta bị ô nhiễm nghiêm trọng là',choices:['thâm canh nông nghiệp cao, sử dụng quá nhiều phân hóa học và thuốc trừ sâu.','hầu hết nước thải của công nghiệp, các đô thị chưa qua xử lí và xả thẳng ra sông.','giao thông vận tải đường thủy phát triển, lượng xăng dầu và chất thải trên sông lớn.','việc khai thác dầu mỏ, khí tự nhiên ở ngoài thềm lục địa và sự cố tràn dầu trên biển.'],answer:1},
+  // PHẦN II (Đúng/Sai) - mỗi ý được chuyển thành 1 câu TRUE/FALSE theo đáp án gốc
+  {id:19,type:'tf',q:'a) Nguyên nhân chính làm cho nguồn nước đang bị ô nhiễm nghiêm trọng ở nước ta là do thâm canh nông nghiệp cao, sử dụng quá nhiều phân hóa học và thuốc trừ sâu.',answer:false},
+  {id:20,type:'tf',q:'b) Giải pháp hữu hiệu để “cứu cánh” môi trường ở nước ta hiện nay là phát triển mạnh nền nông nghiệp hữu cơ.',answer:true},
+  {id:21,type:'tf',q:'c) Tình trạng ô nhiễm đất xảy ra ở các thành phố lớn, nơi tập trung đông dân cư, kinh tế - xã hội phát triển, các vùng chuyên canh, các làng nghề...',answer:true},
+  {id:22,type:'tf',q:'d) Môi trường là điều kiện, là nền tảng, yếu tố tiên quyết cho phát triển kinh tế - xã hội cần tiếp tục hoàn thiện hệ thống chính sách và pháp luật để bảo vệ.',answer:true}
+];
+
+// ======= XÁO TRỘN THỨ TỰ CÂU HỎI =======
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+shuffle(questions); // mỗi lần load sẽ đảo thứ tự câu
+
+// ======= APP STATE =======
+let state = {idx:0,answers:[],timerSecs:15*60,interval:null};
+
+// ======= UI HELPERS =======
+const $quiz = document.getElementById('quizArea');
+const $qCount = document.getElementById('qCount');
+const $timer = document.getElementById('timer');
+const $progress = document.getElementById('progressBar');
+const $prev = document.getElementById('prevBtn');
+const $next = document.getElementById('nextBtn');
+const $submit = document.getElementById('submitBtn');
+const $scoreBox = document.getElementById('scoreBox');
+const $mode = document.getElementById('modeSelect');
+const $resultPanel = document.getElementById('resultPanel');
+const $scoreSummary = document.getElementById('scoreSummary');
+const $answersList = document.getElementById('answersList');
+
+function renderQuestion(i){
+  const q = questions[i];
+  $quiz.innerHTML = '';
+  $qCount.textContent = `Câu ${i+1} / ${questions.length}`;
+  const wrap = document.createElement('div'); wrap.className='question';
+  const qTitle = document.createElement('div'); qTitle.innerHTML = `<strong>${i+1}. ${q.q}</strong>`;
+  wrap.appendChild(qTitle);
+
+  const opts = document.createElement('div'); opts.className='opts';
+
+  if(q.type==='mc'){
+    q.choices.forEach((c,idx)=>{
+      const el = document.createElement('label'); el.className='opt';
+      el.innerHTML = `<input type="radio" name="q${i}" value="${idx}"> ${c}`;
+      el.addEventListener('click',()=>{ state.answers[i]=idx; updateProgress(); });
+      opts.appendChild(el);
+    });
+  } else if(q.type==='tf'){
+    const t = document.createElement('label'); t.className='opt'; t.innerHTML = `<input type="radio" name="q${i}" value="true"> Đúng`;
+    const f = document.createElement('label'); f.className='opt'; f.innerHTML = `<input type="radio" name="q${i}" value="false"> Sai`;
+    t.addEventListener('click',()=>{state.answers[i]=true;updateProgress()});
+    f.addEventListener('click',()=>{state.answers[i]=false;updateProgress()});
+    opts.appendChild(t); opts.appendChild(f);
+  }
+  wrap.appendChild(opts);
+  $quiz.appendChild(wrap);
+
+  // restore selection if present
+  if(state.answers[i] !== undefined){
+    const inputs = document.getElementsByName('q'+i);
+    for(const ip of inputs){
+      if(ip.value === String(state.answers[i])) ip.checked=true;
+      if((ip.value==='true' || ip.value==='false') && String(state.answers[i])===ip.value) ip.checked=true;
+    }
+  }
+}
+
+function updateProgress(){
+  const answered = state.answers.filter(a=>a!==undefined).length;
+  $progress.style.width = `${(answered/questions.length)*100}%`;
+  $scoreBox.textContent = `Đã trả lời: ${answered} / ${questions.length}`;
+}
+
+// nav
+$prev.addEventListener('click',()=>{ if(state.idx>0){ state.idx--; renderQuestion(state.idx); $next.disabled=false; } if(state.idx===0) $prev.disabled=true; });
+$next.addEventListener('click',()=>{ if(state.idx<questions.length-1){ state.idx++; renderQuestion(state.idx); $prev.disabled=false; } if(state.idx===questions.length-1) $next.disabled=true; });
+
+// submit
+$submit.addEventListener('click',submitQuiz);
+
+function submitQuiz(){
+  clearInterval(state.interval);
+  showResults();
+}
+
+function showResults(){
+  let score=0; const total = questions.length;
+  $answersList.innerHTML='';
+  questions.forEach((q,i)=>{
+    const user = state.answers[i];
+    let correct=false;
+    if(q.type==='mc') correct = (user===q.answer);
+    else correct = (user === q.answer);
+    if(correct) score++;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'result ' + (correct ? 'correct' : 'wrong');
+    let text = `<strong>Câu ${i+1}:</strong> ${q.q} <div class="small">`;
+    if(q.type==='mc'){
+      text += `Đáp án đúng: ${q.choices[q.answer]}. `;
+      text += `Bạn chọn: ${ user===undefined ? '<em>Không trả lời</em>' : q.choices[user] }`;
+    } else {
+      text += `Đáp án đúng: ${q.answer ? 'Đúng' : 'Sai'}. Bạn chọn: ${ user===undefined ? '<em>Không trả lời</em>' : (user? 'Đúng' : 'Sai') }`;
+    }
+    text += '</div>';
+    wrap.innerHTML = text;
+    $answersList.appendChild(wrap);
+  });
+  $scoreSummary.textContent = `Bạn được ${score} / ${total} điểm`;
+  $resultPanel.classList.remove('hide');
+  $scoreBox.textContent = `Điểm: ${score} / ${total}`;
+}
+
+// timer
+function startTimer(){
+  const mode = $mode.value;
+  state.interval = setInterval(()=>{
+    state.timerSecs--;
+    if(state.timerSecs<=0){ clearInterval(state.interval); $timer.textContent='00:00'; if(mode==='test'){submitQuiz()} }
+    const m = Math.floor(state.timerSecs/60).toString().padStart(2,'0');
+    const s = String(state.timerSecs%60).padStart(2,'0');
+    $timer.textContent = `${m}:${s}`;
+  },1000);
+}
+
+// on load
+(function init(){
+  state.answers = new Array(questions.length);
+  renderQuestion(0);
+  updateProgress();
+  const t = prompt('Nhập thời lượng bài kiểm tra (phút). Để trống = 15 phút', '15');
+  const val = parseInt(t);
+  if(!isNaN(val) && val>0) state.timerSecs = val*60;
+  const mm = Math.floor(state.timerSecs/60).toString().padStart(2,'0');
+  const ss = String(state.timerSecs%60).padStart(2,'0');
+  $timer.textContent = `${mm}:${ss}`;
+  $progress.style.width='0%';
+  startTimer();
+})();
+
+</script>
+</body>
+</html>
